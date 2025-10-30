@@ -1,31 +1,31 @@
 ﻿using ei8.Avatar.Installer.Common;
+using ei8.Avatar.Installer.Domain.Model;
 using ei8.Avatar.Installer.Domain.Model.Avatars;
 using ei8.Avatar.Installer.IO.Process.Services.Settings;
 using ei8.Cortex.Coding;
 using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Implementation;
 using ei8.Cortex.Coding.d23.neurULization.Persistence;
+using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Persistence;
 using ei8.EventSourcing.Application;
 using ei8.EventSourcing.Client;
+using ei8.EventSourcing.Domain.Model;
+using ei8.EventSourcing.Port.Adapter.IO.Persistence.Events.SQLite;
+using ei8.Extensions.DependencyInjection.Coding;
+using ei8.Extensions.DependencyInjection.Coding.d23.neurULization;
 using ei8.Extensions.DependencyInjection.Cortex;
 using ei8.Extensions.DependencyInjection.EventSourcing;
-using ei8.Extensions.DependencyInjection.Coding.d23.neurULization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Nancy.TinyIoc;
+using neurUL.Common;
 using neurUL.Common.Domain.Model;
 using System.Reflection;
 using System.Text.Json;
-using Microsoft.Extensions.DependencyInjection;
-using ei8.EventSourcing.Port.Adapter.IO.Persistence.Events.SQLite;
-using Microsoft.AspNetCore.DataProtection;
-using ei8.EventSourcing.Domain.Model;
-using ei8.Avatar.Installer.Domain.Model;
-using ei8.Avatar.Installer.Domain.Model.Avatars.Settings;
-using neurUL.Common;
-using System.IO;
 
 namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
 {
@@ -212,9 +212,10 @@ COMMIT;
                             ss.GetKeyPropertyPair()
                         );
                     }
-                    container.Register<IMirrorRepository, InitializingMirrorRepository>();
+                    container.Register<IMirrorRepository, InProcessMirrorRepository>();
                     container.AddDataAdapters();
                     container.Register<INetworkTransactionData, NetworkTransactionData>();
+                    container.AddReadWriteCache();
                     container.Register<INetworkTransactionService, NetworkTransactionService>();
 
                     container.Resolve<ISettingsService>().DatabasePath = sqliteFullPath;
@@ -245,7 +246,7 @@ COMMIT;
                     var mr = container.Resolve<IMirrorRepository>();
                     var missingInitMirrorConfigs = await mr.GetAllMissingAsync(initMirrorKeys);
                     AssertionConcern.AssertArgumentTrue(
-                        await mr.Initialize(missingInitMirrorConfigs.Select(mimc => mimc.Key)),
+                        await mr.Initialize(missingInitMirrorConfigs.Select(mimc => mimc.Keys.First())),
                         "Failed initializing Mirrors."
                     );
 
@@ -255,17 +256,16 @@ COMMIT;
                     container.AddReaders();
                     container.Register<Id23neurULizerOptions, InProcessneurULizerOptions>();
                     container.Register<IneurULizer, neurULizer>();
+                    container.Register(new Network());
                     container.Register<IAvatarWriteRepository, AvatarWriteRepository>();
 
                     // initialize avatar
-                    DateTimeOffset now = DateTimeOffset.Now;
                     await container.Resolve<IAvatarWriteRepository>().Save(
                         new Domain.Model.Avatars.Avatar()
                         {
                             Id = authorNeuronId,
                             Name = avatarItem.OwnerName,
-                            CreationTimestamp = now,
-                            LastModificationTimestamp = now
+                            CreationTimestamp = DateTimeOffset.Now
                         }
                     );
 
@@ -273,8 +273,8 @@ COMMIT;
                 }
                 else
                 {
-                    using (var defaultCommand = new SqliteCommand(sqlStatements, connection))
-                        await defaultCommand.ExecuteNonQueryAsync();
+                    using var defaultCommand = new SqliteCommand(sqlStatements, connection);
+                    await defaultCommand.ExecuteNonQueryAsync();
                 }
             }
 
@@ -283,17 +283,8 @@ COMMIT;
         }
 
         private static IEnumerable<object> GetAppMirrorKeys() =>
-            typeof(MirrorSet).GetProperties().Select(p => p.Name).Cast<object>()
-                .Concat(new object[] {
-                    typeof(Domain.Model.Avatars.Avatar),
-                    typeof(Domain.Model.Avatars.Avatar).GetProperty(nameof(Domain.Model.Avatars.Avatar.Name)),
-                    typeof(Domain.Model.Avatars.Avatar).GetProperty(nameof(Domain.Model.Avatars.Avatar.CreationTimestamp)),
-                    typeof(Domain.Model.Avatars.Avatar).GetProperty(nameof(Domain.Model.Avatars.Avatar.LastModificationTimestamp))
-                })
-                .Concat(new[] {
-                    typeof(string),
-                    typeof(Guid),
-                    typeof(DateTimeOffset)
-                });
+            MirrorInfo.CoreMirrorsKeys
+                .Concat(MirrorInfo.CoreTypes)
+                .Concat(ReflectionExtensions.GetMirrorKeys(typeof(Domain.Model.Avatars.Avatar)));
     }
 }
