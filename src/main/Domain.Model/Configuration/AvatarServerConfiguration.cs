@@ -219,6 +219,7 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
         public string Un8yIp { get; set; }
         public int Un8yBlazorPort { get; set; }
         public string KeysPath { get; set; }
+        public int GraphPersistencePort { get; set; }
 
         /// <summary>
         /// Initialize with defaults
@@ -232,6 +233,7 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
             Un8yIp = "192.168.1.110";
             Un8yBlazorPort = 64103;
             KeysPath = string.Empty;
+            GraphPersistencePort = 8529;
         }
     }
 

@@ -19,7 +19,8 @@
         "un8y_ip": "192.168.1.100",
         "avatar_in_port": 65101,
         "un8y_blazor_port": 65103,
-        "keys_path": "/E/ei8/keys/sample"
+        "keys_path": "/E/ei8/keys/sample",
+        "graph_persistence_port": 8529
       },
       "event_sourcing": 
       {

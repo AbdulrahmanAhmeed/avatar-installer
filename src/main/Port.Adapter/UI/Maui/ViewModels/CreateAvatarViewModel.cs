@@ -95,6 +95,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
     public ValidatableObject<string> Un8yIp { get; private set; }
     public ValidatableObject<string> AvatarInPort { get; private set; }
     public ValidatableObject<string> Un8yBlazorPort { get; private set; }
+    public ValidatableObject<string> GraphPersistencePort { get; private set; }
     public ValidatableObject<string> KeysPath { get; private set; }
 
     // Un8y Properties
@@ -151,6 +152,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
         this.Un8yIp = new ValidatableObject<string>();
         this.AvatarInPort = new ValidatableObject<string>();
         this.Un8yBlazorPort = new ValidatableObject<string>();
+        this.GraphPersistencePort = new ValidatableObject<string>();
         this.KeysPath = new ValidatableObject<string>();
         this.InProcessPrivateKeyPath = new ValidatableObject<string>();
         this.EncryptedEventsKey = new ValidatableObject<string>();
@@ -198,6 +200,16 @@ public partial class CreateAvatarViewModel : BaseViewModel
             ValidationMessage = CreateAvatarConstants.Un8yBlazorPortRequired 
         });
         this.Un8yBlazorPort.Validations.Add(new PortNumberRule<string> 
+        { 
+            ValidationMessage = CreateAvatarConstants.PortRangeInvalid 
+        });
+
+        // Graph persistence port validation
+        this.GraphPersistencePort.Validations.Add(new IsNotNullOrEmptyRule<string> 
+        { 
+            ValidationMessage = CreateAvatarConstants.Un8yBlazorPortRequired 
+        });
+        this.GraphPersistencePort.Validations.Add(new PortNumberRule<string> 
         { 
             ValidationMessage = CreateAvatarConstants.PortRangeInvalid 
         });
@@ -270,6 +282,15 @@ public partial class CreateAvatarViewModel : BaseViewModel
             {
                 this.Un8yBlazorPort.Validate();
                 this.UpdateAvatarIfExists(a => a.Orchestration, (o, port) => o.Un8yBlazorPort = port, this.Un8yBlazorPort.Value, v => int.TryParse(v, out int port) ? port : 0);
+            }
+        };
+
+        this.GraphPersistencePort.PropertyChanged += (s, e) => 
+        {
+            if (e.PropertyName == nameof(ValidatableObject<string>.Value))
+            {
+                this.GraphPersistencePort.Validate();
+                this.UpdateAvatarIfExists(a => a.Orchestration, (o, port) => o.GraphPersistencePort = port, this.GraphPersistencePort.Value, v => int.TryParse(v, out int port) ? port : 0);
             }
         };
 
@@ -417,11 +438,12 @@ public partial class CreateAvatarViewModel : BaseViewModel
         bool isAvatarInPortValid = this.AvatarInPort.Validate();
         bool isUn8yBlazorPortValid = this.Un8yBlazorPort.Validate();
         bool isKeysPathValid = this.KeysPath.Validate();
+        bool isGraphPersistencePortValid = this.GraphPersistencePort.Validate();
         bool isInProcessPrivateKeyPathValid = this.InProcessPrivateKeyPath.Validate();
         bool isEncryptedEventsKeyValid = this.EncryptedEventsKey.Validate();
 
         return isAvatarIpValid && isUn8yIpValid && isAvatarInPortValid && isUn8yBlazorPortValid &&
-               isKeysPathValid && isInProcessPrivateKeyPathValid && isEncryptedEventsKeyValid;
+               isGraphPersistencePortValid && isKeysPathValid && isInProcessPrivateKeyPathValid && isEncryptedEventsKeyValid;
     }
 
 
@@ -464,6 +486,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
                             this.Un8yIp.Value = avatar.Orchestration.Un8yIp;
                             this.AvatarInPort.Value = avatar.Orchestration.AvatarInPort.ToString();
                             this.Un8yBlazorPort.Value = avatar.Orchestration.Un8yBlazorPort.ToString();
+                            this.GraphPersistencePort.Value = avatar.Orchestration.GraphPersistencePort.ToString();
                             this.KeysPath.Value = avatar.Orchestration.KeysPath;
                         }
                         
