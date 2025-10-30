@@ -103,7 +103,7 @@ public class AvatarSettingsRepository : IAvatarSettingsRepository
                 #endregion
 
                 #region AvatarApiSettings
-                case Constants.AvatarApiSettingsEnv.ResourceDatabasePath:
+                case Common.Constants.AvatarApiSettingsEnv.ResourceDatabasePath:
                     avatarSettings.AvatarApi.ResourceDatabasePath = value;
                     break;
                 case Constants.AvatarApiSettingsEnv.RequireAuthentication:

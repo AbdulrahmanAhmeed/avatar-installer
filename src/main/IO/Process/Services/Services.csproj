@@ -25,8 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="ei8.Cortex.Coding.d23.neurULization.Persistence" Version="0.2.8" />
-    <PackageReference Include="ei8.Extensions.DependencyInjection.Coding.d23.neurULization" Version="0.0.3" />
+    <PackageReference Include="ei8.Cortex.Coding.d23.neurULization.Persistence" Version="0.3.6" />
+    <PackageReference Include="ei8.Extensions.DependencyInjection.Coding" Version="0.0.4" />
+    <PackageReference Include="ei8.Extensions.DependencyInjection.Coding.d23.neurULization" Version="0.0.6" />
     <PackageReference Include="ei8.Extensions.DependencyInjection.Cortex" Version="0.0.2" />
     <PackageReference Include="ei8.Extensions.DependencyInjection.EventSourcing" Version="0.0.2" />
     <PackageReference Include="LibGit2Sharp" Version="0.27.2" />

@@ -6,14 +6,13 @@ using ei8.Cortex.Coding;
 using ei8.Cortex.Coding.d23.neurULization;
 using ei8.Cortex.Coding.d23.neurULization.Implementation;
 using ei8.Cortex.Coding.d23.neurULization.Persistence;
-using ei8.Cortex.Coding.d23.neurULization.Persistence.Versioning;
+using ei8.Cortex.Coding.Model.Reflection;
 using ei8.Cortex.Coding.Persistence;
-using ei8.Cortex.Coding.Persistence.Versioning;
-using ei8.Cortex.Coding.Versioning;
 using ei8.EventSourcing.Application;
 using ei8.EventSourcing.Client;
 using ei8.EventSourcing.Domain.Model;
 using ei8.EventSourcing.Port.Adapter.IO.Persistence.Events.SQLite;
+using ei8.Extensions.DependencyInjection.Coding;
 using ei8.Extensions.DependencyInjection.Coding.d23.neurULization;
 using ei8.Extensions.DependencyInjection.Cortex;
 using ei8.Extensions.DependencyInjection.EventSourcing;
@@ -216,6 +215,7 @@ COMMIT;
                     container.Register<IMirrorRepository, InProcessMirrorRepository>();
                     container.AddDataAdapters();
                     container.Register<INetworkTransactionData, NetworkTransactionData>();
+                    container.AddReadWriteCache();
                     container.Register<INetworkTransactionService, NetworkTransactionService>();
 
                     container.Resolve<ISettingsService>().DatabasePath = sqliteFullPath;
@@ -246,7 +246,7 @@ COMMIT;
                     var mr = container.Resolve<IMirrorRepository>();
                     var missingInitMirrorConfigs = await mr.GetAllMissingAsync(initMirrorKeys);
                     AssertionConcern.AssertArgumentTrue(
-                        await mr.Initialize(missingInitMirrorConfigs.Select(mimc => mimc.Key)),
+                        await mr.Initialize(missingInitMirrorConfigs.Select(mimc => mimc.Keys.First())),
                         "Failed initializing Mirrors."
                     );
 
@@ -257,7 +257,6 @@ COMMIT;
                     container.Register<Id23neurULizerOptions, InProcessneurULizerOptions>();
                     container.Register<IneurULizer, neurULizer>();
                     container.Register(new Network());
-                    container.Register<ICreationWriteRepository, InProcessCreationWriteRepository>();
                     container.Register<IAvatarWriteRepository, AvatarWriteRepository>();
 
                     // initialize avatar
@@ -265,16 +264,8 @@ COMMIT;
                         new Domain.Model.Avatars.Avatar()
                         {
                             Id = authorNeuronId,
-                            Name = avatarItem.OwnerName
-                        }
-                    );
-
-                    await container.Resolve<ICreationWriteRepository>().Save(
-                        new Creation()
-                        {
-                            Id = Guid.NewGuid(),
-                            SubjectId = authorNeuronId,
-                            Timestamp = DateTimeOffset.Now
+                            Name = avatarItem.OwnerName,
+                            CreationTimestamp = DateTimeOffset.Now
                         }
                     );
 
@@ -282,8 +273,8 @@ COMMIT;
                 }
                 else
                 {
-                    using (var defaultCommand = new SqliteCommand(sqlStatements, connection))
-                        await defaultCommand.ExecuteNonQueryAsync();
+                    using var defaultCommand = new SqliteCommand(sqlStatements, connection);
+                    await defaultCommand.ExecuteNonQueryAsync();
                 }
             }
 
@@ -292,20 +283,8 @@ COMMIT;
         }
 
         private static IEnumerable<object> GetAppMirrorKeys() =>
-            typeof(MirrorSet).GetProperties().Select(p => p.Name).Cast<object>()
-                .Concat(new object[] {
-                    typeof(Domain.Model.Avatars.Avatar),
-                    typeof(Domain.Model.Avatars.Avatar).GetProperty(nameof(Domain.Model.Avatars.Avatar.Name)),
-                })
-                .Concat(new[] {
-                    typeof(string),
-                    typeof(Guid),
-                    typeof(DateTimeOffset)
-                })
-                .Concat(new object[] {
-                    typeof(Creation),
-                    typeof(Creation).GetProperty(nameof(Creation.SubjectId)),
-                    typeof(Creation).GetProperty(nameof(Creation.Timestamp))
-                });
+            MirrorInfo.CoreMirrorsKeys
+                .Concat(MirrorInfo.CoreTypes)
+                .Concat(ReflectionExtensions.GetMirrorKeys(typeof(Domain.Model.Avatars.Avatar)));
     }
 }
