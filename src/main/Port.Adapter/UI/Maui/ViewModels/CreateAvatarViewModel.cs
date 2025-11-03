@@ -44,6 +44,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
         public const string AvatarPortRequired = "Avatar port is required";
         public const string PortRangeInvalid = "Port must be between 1 and 65535";
         public const string Un8yBlazorPortRequired = "Un8y Blazor port is required";
+        public const string GraphPersistencePortRequired = "Graph persistence port is required";
         public const string KeysPathRequiredWhenEncryptionEnabled = "Keys path is required when encryption is enabled";
         public const string InProcessPrivateKeyPathRequired = "In Process Private Key Path is required when encryption is enabled";
         public const string PrivateKeyFileExtensionInvalid = "Private key file must have .key, .pem, .p12, or .pfx extension";
@@ -207,7 +208,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
         // Graph persistence port validation
         this.GraphPersistencePort.Validations.Add(new IsNotNullOrEmptyRule<string> 
         { 
-            ValidationMessage = CreateAvatarConstants.Un8yBlazorPortRequired 
+            ValidationMessage = CreateAvatarConstants.GraphPersistencePortRequired 
         });
         this.GraphPersistencePort.Validations.Add(new PortNumberRule<string> 
         { 
