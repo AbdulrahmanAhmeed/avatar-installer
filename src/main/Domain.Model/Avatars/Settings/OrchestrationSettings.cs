@@ -7,4 +7,5 @@ public class OrchestrationSettings
     public string Un8yIp { get; set; }
     public int Un8yBlazorPort { get; set; }
     public string KeysPath { get; set; }
+    public int GraphPersistencePort { get; set; }
 }
