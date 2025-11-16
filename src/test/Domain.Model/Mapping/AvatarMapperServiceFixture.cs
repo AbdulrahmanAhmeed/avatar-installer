@@ -338,7 +338,7 @@ namespace Domain.Model.Test.Mapping
                         {
                             PageSize = 6,
                             AppUserId = "jono",
-                            CreateExternalReferencesIfNotFound = false
+                            InitializeMissingMirrors = false
                         }
                     },
 
@@ -352,14 +352,14 @@ namespace Domain.Model.Test.Mapping
 
             Assert.Equal(6, sampleResult.Settings.CortexChatNucleus.PageSize);
             Assert.Equal("jono", sampleResult.Settings.CortexChatNucleus.AppUserId);
-            Assert.False(sampleResult.Settings.CortexChatNucleus.CreateExternalReferencesIfNotFound);
+            Assert.False(sampleResult.Settings.CortexChatNucleus.InitializeMissingMirrors);
 
             var defaultTarget = new AvatarItem("id_defaults5", "defaults");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal(10, defaultResult.Settings.CortexChatNucleus.PageSize);
             Assert.Equal("me2@me2.com", defaultResult.Settings.CortexChatNucleus.AppUserId);
-            Assert.True(defaultResult.Settings.CortexChatNucleus.CreateExternalReferencesIfNotFound);
+            Assert.True(defaultResult.Settings.CortexChatNucleus.InitializeMissingMirrors);
         }
 
         [Fact]

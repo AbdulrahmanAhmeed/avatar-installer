@@ -241,13 +241,13 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
     {
         public int PageSize { get; set; }
         public string AppUserId { get; set; }
-        public bool CreateExternalReferencesIfNotFound { get; set; }
+        public bool InitializeMissingMirrors { get; set; }
 
         public CortexChatNucleusConfiguration(string appUserId)
         {
             this.PageSize =  10;
             this.AppUserId = appUserId;
-            this.CreateExternalReferencesIfNotFound = true;
+            this.InitializeMissingMirrors = true;
         }
 
         [JsonConstructor]
