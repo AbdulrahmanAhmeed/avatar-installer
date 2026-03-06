@@ -26,10 +26,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Mapping
         {
             CreateMap<AvatarConfigurationItem, AvatarItem>()
                 .ForPath(
-                    dest => dest.RoutingSettings,
-                    opt => opt.MapFrom(src => src.Routing)
-                )
-                .ForPath(
                     dest => dest.Settings.CortexGraphPersistence,
                     opt => opt.MapFrom(src => src.CortexGraphPersistence)
                 )
@@ -74,7 +70,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Mapping
                     d.Settings.CortexChatNucleus.AppUserId = s.OwnerUserId;
                 });
 
-            CreateMap<RoutingConfiguration, RoutingSettings>();
             CreateMap<CortexGraphPersistenceConfiguration, CortexGraphPersistenceSettings>();
             CreateMap<CortexGraphConfiguration, CortexGraphSettings>();
             CreateMap<AvatarApiConfiguration, AvatarApiSettings>();

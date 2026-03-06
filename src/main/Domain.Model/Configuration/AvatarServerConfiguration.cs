@@ -31,7 +31,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
         /// The user id which is mapped to the neurULized Avatar instance in Iden8y.
         /// </summary>
         public string OwnerUserId { get; set; }
-        public RoutingConfiguration Routing { get; set; }
         public EventSourcingConfiguration EventSourcing { get; set; }
         public CortexGraphPersistenceConfiguration CortexGraphPersistence { get; set; }
         public CortexGraphConfiguration CortexGraph { get; set; }
@@ -45,7 +44,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
         [JsonConstructor]
         public AvatarConfigurationItem()
         {
-            this.Routing = new();
             this.EventSourcing = new();
             this.CortexGraphPersistence = new();
             this.CortexGraph = new();
@@ -160,21 +158,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
             BasePath = "/${AVATAR_NAME}/un8y";
             CertificatePassword = string.Empty;
             CertificatePath = "/https/aspnetapp.pfx";
-        }
-    }
-
-    public class RoutingConfiguration
-    {
-        public string neurULServerDomainName { get; set; }
-
-        /// <summary>
-        /// Initialize with defaults
-        /// </summary>
-
-        [JsonConstructor]
-        public RoutingConfiguration()
-        {
-            neurULServerDomainName = "fibona.cc";
         }
     }
 

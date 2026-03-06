@@ -26,37 +26,6 @@ namespace Domain.Model.Test.Mapping
         }
 
         [Fact]
-        public void MapsRoutingConfiguration()
-        {
-            var config = new AvatarServerConfiguration()
-            {
-                Avatars = new AvatarConfigurationItem[2]
-                {
-                    new()
-                    {
-                        Routing = new()
-                        {
-                            neurULServerDomainName = "www.neurul.net"
-                        }
-                    },
-                    new()
-                }
-            };
-
-            var sut = new AvatarMapperService(mapper);
-
-            var sampleTarget = new AvatarItem("id_sample1");
-            var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
-
-            Assert.Equal("www.neurul.net", sampleResult.RoutingSettings.neurULServerDomainName);
-
-            var defaultTarget = new AvatarItem("id_defaults1");
-            var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
-
-            Assert.Equal("fibona.cc", defaultResult.RoutingSettings.neurULServerDomainName);
-        }
-
-        [Fact]
         public void MapsCortexGraphPersistenceConfiguration()
         {
             var config = new AvatarServerConfiguration()

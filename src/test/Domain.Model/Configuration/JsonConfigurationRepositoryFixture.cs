@@ -16,8 +16,6 @@ namespace Domain.Model.Test.Configuration
 
             Assert.Single(result.Avatars);
 
-            Assert.Equal("neurul.net", result.Avatars[0].Routing!.neurULServerDomainName);
-
             // cortex_graph
             Assert.Equal("graph", result.Avatars[0].CortexGraph!.DbName);
             Assert.Equal("root", result.Avatars[0].CortexGraph!.DbUsername);
@@ -66,7 +64,6 @@ namespace Domain.Model.Test.Configuration
             var result = await sut.GetByIdAsync(jsonFile);
 
             Assert.Single(result.Avatars);
-            Assert.Equal("fibona.cc", result.Avatars[0].Routing!.neurULServerDomainName);
 
             // cortex_graph
             Assert.Equal("graph", result.Avatars[0].CortexGraph!.DbName);
@@ -125,9 +122,6 @@ namespace Domain.Model.Test.Configuration
 
         private void AssertDefaultValues(string avatarName, AvatarConfigurationItem avatar)
         {
-            // routing
-            Assert.Equal("fibona.cc", avatar.Routing!.neurULServerDomainName);
-
             // cortex_graph
             Assert.Equal("graph_${AVATAR_NAME}", avatar.CortexGraph!.DbName);
             Assert.Equal("root", avatar.CortexGraph!.DbUsername);

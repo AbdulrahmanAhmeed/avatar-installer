@@ -20,7 +20,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Avatars
         /// </summary>
         public string OwnerUserId { get; set; }
 
-        public RoutingSettings RoutingSettings { get; set; } = new();
         public AvatarSettings Settings { get; set; } = new();
         public Un8ySettings Un8ySettings { get; set; } = new();
         public OrchestrationSettings OrchestrationSettings { get; set; } = new();
