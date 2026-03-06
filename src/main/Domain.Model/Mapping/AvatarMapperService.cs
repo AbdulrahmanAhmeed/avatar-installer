@@ -38,7 +38,7 @@ namespace ei8.Avatar.Installer.Domain.Model.Mapping
                     opt => opt.MapFrom(src => src.CortexGraph)
                 )
                 .ForPath(
-                    dest => dest.Settings.AvatarApi, 
+                    dest => dest.Settings.AvatarApi,
                     opt => opt.MapFrom(src => src.AvatarApi)
                 )
                 .ForPath(
@@ -60,7 +60,19 @@ namespace ei8.Avatar.Installer.Domain.Model.Mapping
                 .ForPath(
                     dest => dest.Settings.EventSourcing,
                     opt => opt.MapFrom(src => src.EventSourcing)
-                );
+                )
+                .ForPath(
+                    dest => dest.Settings.Ssh,
+                    opt => opt.MapFrom(src => src.Ssh)
+                )
+                .AfterMap((s, d) =>
+                {
+                    d.Settings.Ssh.RemoteForward = $"{s.Orchestration.AvatarName}:80 localhost:{s.Orchestration.TunnelLocalPort}";
+                })
+                .AfterMap((s, d) =>
+                {
+                    d.Settings.CortexChatNucleus.AppUserId = s.OwnerUserId;
+                });
 
             CreateMap<RoutingConfiguration, RoutingSettings>();
             CreateMap<CortexGraphPersistenceConfiguration, CortexGraphPersistenceSettings>();
@@ -75,6 +87,7 @@ namespace ei8.Avatar.Installer.Domain.Model.Mapping
                     opt => opt.MapFrom(src => src.OidcAuthorityUrl)
                 );
             CreateMap<EventSourcingConfiguration, EventSourcingSettings>();
+            CreateMap<SshConfiguration, SshSettings>();
         }
     }
 }

@@ -27,8 +27,6 @@ namespace ei8.Avatar.Installer.CLI
                                 .AddScoped<IConfigurationRepository, JsonConfigurationRepository>()
                                 .AddScoped<IAvatarItemWriteRepository, AvatarItemWriteRepository>()
                                 .AddScoped<IAvatarMapperService, AvatarMapperService>()
-                                .AddScoped<IAvatarServerRepository, AvatarServerRepository>()
-                                .AddScoped<IAvatarServerMapperService, AvatarServerMapperService>()
                                 .AddScoped<IAvatarApplicationService, AvatarApplicationService>();
 
                 builder.Services.AddAutoMapper(cfg => { }, typeof(AvatarAutoMapperProfile));

@@ -1,11 +1,15 @@
 {
     "avatars": [
-        {
-            "name": "avatar-work"
-        },
-        {
-            "name": "avatar-personal"
+      {
+        "orchestration": {
+          "avatar_name": "avatar-work"
         }
+      },
+      {
+        "orchestration": {
+          "avatar_name": "avatar-personal"
+        }
+      }
     ],
     "destination": "./sample"
 }

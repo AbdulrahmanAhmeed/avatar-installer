@@ -28,29 +28,29 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapsRoutingConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         Routing = new()
                         {
                             neurULServerDomainName = "www.neurul.net"
                         }
                     },
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
 
-            var sampleTarget = new AvatarItem("id_sample1", "sample");
+            var sampleTarget = new AvatarItem("id_sample1");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal("www.neurul.net", sampleResult.RoutingSettings.neurULServerDomainName);
 
-            var defaultTarget = new AvatarItem("id_defaults1", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults1");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal("fibona.cc", defaultResult.RoutingSettings.neurULServerDomainName);
@@ -59,29 +59,29 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapsCortexGraphPersistenceConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-            new("sample", "me@me.com")
+            new()
             {
                 CortexGraphPersistence = new()
                 {
                     ArangoRootPassword = "test",
                 }
             },
-            new("defaults", "me@me.com")
+            new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
 
-            var sampleTarget = new AvatarItem("id_sample1", "sample");
+            var sampleTarget = new AvatarItem("id_sample1");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal("test", sampleResult.Settings.CortexGraphPersistence.ArangoRootPassword);
 
-            var defaultTarget = new AvatarItem("id_defaults1", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults1");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal("", defaultResult.Settings.CortexGraphPersistence.ArangoRootPassword);
@@ -90,11 +90,11 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapsCortexGraphConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         CortexGraph = new()
                         {
@@ -103,23 +103,23 @@ namespace Domain.Model.Test.Mapping
                             DbUsername = "not-root"
                         }
                     },
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
 
-            var sampleTarget = new AvatarItem("id_sample1", "sample");
+            var sampleTarget = new AvatarItem("id_sample1");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal("custom", sampleResult.Settings.CortexGraph.DbName);
             Assert.Equal(@"http://www.example.com", sampleResult.Settings.CortexGraph.DbUrl);
             Assert.Equal("not-root", sampleResult.Settings.CortexGraph.DbUsername);
 
-            var defaultTarget = new AvatarItem("id_defaults1", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults1");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
-            Assert.Equal("graph_defaults", defaultResult.Settings.CortexGraph.DbName);
+            Assert.Equal("graph_${AVATAR_NAME}", defaultResult.Settings.CortexGraph.DbName);
             Assert.Equal(@"http://cortex.graph.persistence:8529", defaultResult.Settings.CortexGraph.DbUrl);
             Assert.Equal("root", defaultResult.Settings.CortexGraph.DbUsername);
         }
@@ -127,11 +127,11 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapsAvatarApiConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         AvatarApi = new()
                         {
@@ -141,12 +141,12 @@ namespace Domain.Model.Test.Mapping
                         }
                     },
 
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample2", "sample");
+            var sampleTarget = new AvatarItem("id_sample2");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal("api", sampleResult.Settings.AvatarApi.ApiName);
@@ -154,21 +154,21 @@ namespace Domain.Model.Test.Mapping
             Assert.Equal("Guestotototto", sampleResult.Settings.AvatarApi.AnonymousUserId);
 
 
-            var defaultTarget = new AvatarItem("id_defaults2", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults2");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
-            Assert.Equal("avatarapi-defaults", defaultResult.Settings.AvatarApi.ApiName);
+            Assert.Equal("avatarapi-${AVATAR_NAME}", defaultResult.Settings.AvatarApi.ApiName);
             Assert.Equal(@"https://login.fibona.cc", defaultResult.Settings.AvatarApi.TokenIssuerAddress);
         }
 
         [Fact]
         public void MapsCortexLibraryConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         CortexLibrary = new()
                         {
@@ -177,33 +177,33 @@ namespace Domain.Model.Test.Mapping
                         }
                     },
 
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample3", "sample");
+            var sampleTarget = new AvatarItem("id_sample3");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal(@"https://neuronsurl.example.com", sampleResult.Settings.CortexLibrary.NeuronsUrl);
             Assert.Equal(@"https://terminalsurl.example.com", sampleResult.Settings.CortexLibrary.TerminalsUrl);
 
 
-            var defaultTarget = new AvatarItem("id_defaults3", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults3");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
-            Assert.Equal(@"https://fibona.cc/defaults/cortex/neurons", defaultResult.Settings.CortexLibrary.NeuronsUrl);
-            Assert.Equal(@"https://fibona.cc/defaults/cortex/terminals", defaultResult.Settings.CortexLibrary.TerminalsUrl);
+            Assert.Equal(@"https://fibona.cc/${AVATAR_NAME}/cortex/neurons", defaultResult.Settings.CortexLibrary.NeuronsUrl);
+            Assert.Equal(@"https://fibona.cc/${AVATAR_NAME}/cortex/terminals", defaultResult.Settings.CortexLibrary.TerminalsUrl);
         }
 
         [Fact]
         public void MapsEventSourcingConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         EventSourcing = new()
                         {
@@ -214,12 +214,12 @@ namespace Domain.Model.Test.Mapping
                         }
                     },
 
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample3", "sample");
+            var sampleTarget = new AvatarItem("id_sample3");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal(@"my/path", sampleResult.Settings.EventSourcing.PrivateKeyPath);
@@ -227,7 +227,7 @@ namespace Domain.Model.Test.Mapping
             Assert.True(sampleResult.Settings.EventSourcing.EncryptionEnabled);
             Assert.Equal(@"enckey", sampleResult.Settings.EventSourcing.EncryptedEventsKey);
 
-            var defaultTarget = new AvatarItem("id_defaults3", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults3");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal("/C/keys/private.key", defaultResult.Settings.EventSourcing.PrivateKeyPath);
@@ -239,11 +239,11 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapsUn8yConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         Un8y = new()
                         {
@@ -256,12 +256,12 @@ namespace Domain.Model.Test.Mapping
                         }
                     },
 
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample4", "sample");
+            var sampleTarget = new AvatarItem("id_sample4");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal(@"https://www.example.com", sampleResult.Un8ySettings.OidcAuthority);
@@ -271,13 +271,13 @@ namespace Domain.Model.Test.Mapping
             Assert.Equal("certpassword", sampleResult.Un8ySettings.CertificatePassword);
             Assert.Equal("/cert/path", sampleResult.Un8ySettings.CertificatePath);
 
-            var defaultTarget = new AvatarItem("id_defaults4", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults4");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal(@"https://login.fibona.cc", defaultResult.Un8ySettings.OidcAuthority);
-            Assert.Equal("un8y-defaults", defaultResult.Un8ySettings.ClientId);
-            Assert.Equal($"openid,profile,email,avatarapi-defaults,offline_access", defaultResult.Un8ySettings.RequestedScopes);
-            Assert.Equal("/defaults/un8y", defaultResult.Un8ySettings.BasePath);
+            Assert.Equal("un8y-${AVATAR_NAME}", defaultResult.Un8ySettings.ClientId);
+            Assert.Equal("openid,profile,email,avatarapi-${AVATAR_NAME},offline_access", defaultResult.Un8ySettings.RequestedScopes);
+            Assert.Equal("/${AVATAR_NAME}/un8y", defaultResult.Un8ySettings.BasePath);
             Assert.Equal(string.Empty, defaultResult.Un8ySettings.CertificatePassword);
             Assert.Equal("/https/aspnetapp.pfx", defaultResult.Un8ySettings.CertificatePath);
         }
@@ -285,96 +285,137 @@ namespace Domain.Model.Test.Mapping
         [Fact]
         public void MapOrchestrationConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
                         Orchestration = new()
                         {
-                            AvatarInPort = 12345,
-                            AvatarIp = "127.0.0.1",
-                            Un8yBlazorPort = 67890,
-                            Un8yIp = "127.0.0.2",
+                            AvatarName = "myavatar",
+                            TunnelLocalPort = 9999,
                             KeysPath = "my/keys"
                         }
                     },
 
-                    new("defaults", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample5", "sample");
+            var sampleTarget = new AvatarItem("id_sample5");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
-            Assert.Equal("127.0.0.1", sampleResult.OrchestrationSettings.AvatarIp);
-            Assert.Equal("127.0.0.2", sampleResult.OrchestrationSettings.Un8yIp);
-            Assert.Equal(12345, sampleResult.OrchestrationSettings.AvatarInPort);
-            Assert.Equal(67890, sampleResult.OrchestrationSettings.Un8yBlazorPort);
+            Assert.Equal("myavatar", sampleResult.OrchestrationSettings.AvatarName);
+            Assert.Equal(9999, sampleResult.OrchestrationSettings.TunnelLocalPort);
             Assert.Equal("my/keys", sampleResult.OrchestrationSettings.KeysPath);
 
-            var defaultTarget = new AvatarItem("id_defaults5", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults5");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
-            Assert.Equal("192.168.1.110", defaultResult.OrchestrationSettings.AvatarIp);
-            Assert.Equal("192.168.1.110", defaultResult.OrchestrationSettings.Un8yIp);
-            Assert.Equal(64101, defaultResult.OrchestrationSettings.AvatarInPort);
-            Assert.Equal(64103, defaultResult.OrchestrationSettings.Un8yBlazorPort);
+            Assert.Equal("sample", defaultResult.OrchestrationSettings.AvatarName);
+            Assert.Equal(9393, defaultResult.OrchestrationSettings.TunnelLocalPort);
             Assert.Equal(string.Empty, defaultResult.OrchestrationSettings.KeysPath);
         }
 
         [Fact]
         public void MapsCortexChatNucleusConfiguration()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[2]
                 {
-                    new("sample", "me@me.com")
+                    new()
                     {
+                        OwnerUserId = "jono",
                         CortexChatNucleus  = new()
                         {
                             PageSize = 6,
-                            AppUserId = "jono",
                             InitializeMissingMirrors = false
                         }
                     },
 
-                    new("defaults", "me2@me2.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample5", "sample");
+            var sampleTarget = new AvatarItem("id_sample5");
             var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
 
             Assert.Equal(6, sampleResult.Settings.CortexChatNucleus.PageSize);
             Assert.Equal("jono", sampleResult.Settings.CortexChatNucleus.AppUserId);
             Assert.False(sampleResult.Settings.CortexChatNucleus.InitializeMissingMirrors);
 
-            var defaultTarget = new AvatarItem("id_defaults5", "defaults");
+            var defaultTarget = new AvatarItem("id_defaults5");
             var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
 
             Assert.Equal(10, defaultResult.Settings.CortexChatNucleus.PageSize);
-            Assert.Equal("me2@me2.com", defaultResult.Settings.CortexChatNucleus.AppUserId);
+            Assert.Null(defaultResult.Settings.CortexChatNucleus.AppUserId);
             Assert.True(defaultResult.Settings.CortexChatNucleus.InitializeMissingMirrors);
+        }
+
+        [Fact]
+        public void MapsSshConfiguration()
+        {
+            var config = new AvatarServerConfiguration()
+            {
+                Avatars = new AvatarConfigurationItem[2]
+                {
+                    new()
+                    {
+                        OwnerUserId = "jono",
+                        Orchestration = new()
+                        {
+                            AvatarName = "ssher",
+                            TunnelLocalPort = 88
+                        },
+                        Ssh = new()
+                        {
+                            HostName = "ei8hoster.com",
+                            Port = 93,
+                            ServerAliveCountMax = 77,
+                            ServerAliveInterval = 3
+                        }
+                    },
+                    new()
+                }
+            };
+
+            var sut = new AvatarMapperService(mapper);
+            var sampleTarget = new AvatarItem("id_sample5");
+            var sampleResult = sut.Apply(config.Avatars[0], sampleTarget);
+
+            Assert.Equal("ssher:80 localhost:88", sampleResult.Settings.Ssh.RemoteForward);
+            Assert.Equal("ei8hoster.com", sampleResult.Settings.Ssh.HostName);
+            Assert.Equal(93, sampleResult.Settings.Ssh.Port);
+            Assert.Equal(77, sampleResult.Settings.Ssh.ServerAliveCountMax);
+            Assert.Equal(3, sampleResult.Settings.Ssh.ServerAliveInterval);
+
+            var defaultTarget = new AvatarItem("id_defaults5");
+            var defaultResult = sut.Apply(config.Avatars[1], defaultTarget);
+
+            Assert.Equal("sample:80 localhost:9393", defaultResult.Settings.Ssh.RemoteForward);
+            Assert.Equal("ei8.host", defaultResult.Settings.Ssh.HostName);
+            Assert.Equal(2222, defaultResult.Settings.Ssh.Port);
+            Assert.Equal(60 * 24 * 365, defaultResult.Settings.Ssh.ServerAliveCountMax);
+            Assert.Equal(60, defaultResult.Settings.Ssh.ServerAliveInterval);
         }
 
         [Fact]
         public void DoesNotOverwritePropertiesNotConfigured()
         {
-            var config = new AvatarServerConfiguration("myserver")
+            var config = new AvatarServerConfiguration()
             {
                 Avatars = new AvatarConfigurationItem[1]
                 {
-                    new("sample", "me@me.com")
+                    new()
                 }
             };
 
             var sut = new AvatarMapperService(mapper);
-            var sampleTarget = new AvatarItem("id_sample6", "sample")
+            var sampleTarget = new AvatarItem("id_sample6")
             {
                 Settings = new AvatarSettings
                 {

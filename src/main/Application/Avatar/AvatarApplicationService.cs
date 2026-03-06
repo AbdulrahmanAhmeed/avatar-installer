@@ -16,8 +16,6 @@ namespace ei8.Avatar.Installer.Application.Avatar
         private readonly IAvatarItemWriteRepository avatarItemWriteRepository;
         private readonly IAvatarMapperService avatarMapperService;
         private readonly ITemplateService templateService;
-        private readonly IAvatarServerRepository avatarServerRepository;
-        private readonly IAvatarServerMapperService avatarServerMapperService;
 
         public AvatarApplicationService(
             IConfigurationRepository configurationRepository,
@@ -26,9 +24,7 @@ namespace ei8.Avatar.Installer.Application.Avatar
             IAvatarItemReadRepository avatarItemReadRepository,
             IAvatarItemWriteRepository avatarItemWriteRepository,
             IAvatarMapperService avatarMapperService,
-            ITemplateService templateService,
-            IAvatarServerRepository avatarServerRepository,
-            IAvatarServerMapperService avatarServerMapperService
+            ITemplateService templateService
         )
         {
             this.configurationRepository = configurationRepository;
@@ -38,9 +34,8 @@ namespace ei8.Avatar.Installer.Application.Avatar
             this.avatarItemWriteRepository = avatarItemWriteRepository;
             this.avatarMapperService = avatarMapperService;
             this.templateService = templateService;
-            this.avatarServerRepository = avatarServerRepository;
-            this.avatarServerMapperService = avatarServerMapperService;
         }
+
         public async Task<AvatarServerConfiguration> ReadAvatarConfiguration(string configPath)
         {
             AssertionConcern.AssertArgumentNotNull(configPath, nameof(configPath));
@@ -60,9 +55,9 @@ namespace ei8.Avatar.Installer.Application.Avatar
             this.progressService.Update(0.3, "Configuring Avatar...");
             foreach (var item in configObject.Avatars)
             {
-                logger.LogInformation("Setting up avatar {itemName}", item.Name);
+                logger.LogInformation("Setting up avatar {itemName}", item.Orchestration.AvatarName);
 
-                var subdirectory = Path.Combine(configObject.Destination, item.Name);
+                var subdirectory = Path.Combine(configObject.Destination, item.Orchestration.AvatarName);
                 var templateUrl = configObject.TemplateUrl;
 
                 if (Directory.Exists(subdirectory) && Directory.GetFiles(subdirectory).Any())
@@ -77,17 +72,14 @@ namespace ei8.Avatar.Installer.Application.Avatar
 
                 var mappedAvatar = avatarMapperService.Apply(item, avatar);
 
+                this.progressService.Update(0.8, "Saving Avatar...");
+
                 await this.avatarItemWriteRepository.SaveAsync(mappedAvatar);
+
+                
             }
 
-            this.progressService.Update(0.5, "Mapping Avatar...");
-            var avatarServer = await avatarServerRepository.GetByAsync(configObject.Destination);
-            var mappedAvatarServer = avatarServerMapperService.Apply(configObject, avatarServer);
-
-            this.progressService.Update(0.8, "Saving Avatar...");
-            await avatarServerRepository.SaveAsync(mappedAvatarServer);
-
-            this.progressService.Update(1.0, "Finished Creating Avatar!");
+            this.progressService.Update(1.0, "Finished Creating Avatars!");
         }
         
     }

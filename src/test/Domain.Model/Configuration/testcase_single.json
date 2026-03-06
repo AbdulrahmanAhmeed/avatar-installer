@@ -1,63 +1,54 @@
 {
     "avatars": [
-        {
-          "name": "junvic",
+      {
+        "routing": {
+          "neurul_server_domain_name": "neurul.net"
+        },
 
-          "routing": {
-            "neurul_server_domain_name": "neurul.net"
-          },
+        "cortex_graph": {
+          "db_name": "graph",
+          "db_username": "root",
+          "db_url": "http://cortex.graph.persistence:8529",
+          "arango_root_password": ""
+        },
 
-            "cortex_graph": {
-                "db_name": "graph",
-                "db_username": "root",
-                "db_url": "http://cortex.graph.persistence:8529",
-                "arango_root_password": ""
-            },
+        "avatar_api": {
+          "token_issuer_address": "https://www.example.com/token",
+          "api_name": "avatarapi-junvic"
+        },
 
-            "avatar_api": {
-                "token_issuer_address": "https://www.example.com/token",
-                "api_name": "avatarapi-junvic"
-            },
+        "cortex_library": {
+          "neurons_url": "http://fibona.cc/junvic/cortex/neurons",
+          "terminals_url": "http://fibona.cc/junvic/cortex/terminals"
+        },
 
-            "cortex_library": {
-                "neurons_url": "http://fibona.cc/junvic/cortex/neurons",
-                "terminals_url": "http://fibona.cc/junvic/cortex/terminals"
-            },
+        "un8y": {
+          "oidc_authority_url": "https://www.example.com/oidc",
+          "client_id": "un8y-junvic",
+          "base_path": "/junvic/un8y",
+          "certificate_password": "mypass",
+          "certificate_path": "/mypath/my.pfx"
+        },
 
-          "un8y": {
-            "oidc_authority_url": "https://www.example.com/oidc",
-            "client_id": "un8y-junvic",
-            "base_path": "/junvic/un8y",
-            "certificate_password": "mypass",
-            "certificate_path": "/mypath/my.pfx"
-          },
+        "event_sourcing": {
+          "private_key_path": "/key/path",
+          "in_process_private_key_path": "/key/inprocesspath",
+          "encryption_enabled": true,
+          "encrypted_events_key": "encryptedkey"
+        },
 
-          "event_sourcing": {
-            "private_key_path": "/key/path",
-            "in_process_private_key_path": "/key/inprocesspath",
-            "encryption_enabled": true,
-            "encrypted_events_key": "encryptedkey"
-          },
-
-          "orchestration": {
-            "avatar_ip": "192.168.1.110",
-            "un8y_ip": "192.168.1.111",
-            "avatar_in_port": 64101,
-            "un8y_blazor_port": 64103,
-            "keys_path": "my/keys"
-          }
-        }
-    ],
-    "destination": "./sample",
-    "network": {
-        "local_ip": "192.168.1.110",
+        "orchestration": {
+          "avatar_name": "jsonavatar",
+          "tunnel_local_port": 9441,
+          "keys_path": "my/keys"
+        },
         "ssh": {
-            "server_alive_interval": 60,
-            "server_alive_count_max": 525600,
-            "port": 2222,
-            "host_name": "ei8.host",
-            "remote_forward": "jv:80",
-            "local_port": 9393
+          "server_alive_interval": 60,
+          "server_alive_count_max": 525600,
+          "port": 2222,
+          "host_name": "ei8.host"
         }
-    }
+      }
+    ],
+    "destination": "./sample"
 }
