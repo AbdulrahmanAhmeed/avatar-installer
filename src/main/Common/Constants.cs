@@ -4,13 +4,10 @@
     {
         public sealed class Filenames
         {
-            public const string TraefikToml = "traefik.toml";
             public const string SshConfig = "ssh_config";
 
-            public const string StartTraefikBat = "start - traefik.bat";
-            public const string StartEi8SiteBat = "start - ei8.site.bat";
-            public const string LoopStartEi8SiteBat = "loop start - ei8.site.bat";
-            public const string AutoLockCmd = "autolock.cmd";
+            public const string StartEi8HostBat = "start - ei8.host.bat";
+            public const string LoopStartEi8HostBat = "loop start - ei8.host.bat";
             public const string VariablesEnv = "variables.env";
             public const string Env = ".env";
 
@@ -191,6 +188,11 @@
             public const string AlreadyExists = "{0} already exists";
         }
 
+        public sealed class Paths
+        {
+            public const string Avatars = "%USERPROFILE%\\Documents\\ei8\\Avatar";
+        }
+
         public sealed class Urls
         {
             public const string DefaultTemplateDownloadUrl = "https://github.com/ei8/avatar-template.git";
@@ -198,18 +200,14 @@
 
         public sealed class BatchFileTemplates
         {
-            public const string StartTraefikBat = @"traefik_windows-amd64.exe -c {0}";
-            public const string StartEi8SiteBat = "@echo off\n" +
+            public const string StartEi8HostBat = "@echo off\n" +
                                                   "@echo ___________________________________________\n" +
                                                   "@echo Started: %date% %time%\n" +
-                                                  "ssh -F {0} ei8.site";
+                                                  "ssh -F {0} ei8.host";
 
-            public const string LoopStartEi8SiteBat = "@echo off\n" +
+            public const string LoopStartEi8HostBat = "@echo off\n" +
                                                       "@echo Loop-starting ... \n" +
-                                                     @"FOR /L %%N IN () DO call ""start - ei8.site.bat""";
-
-            public const string AutoLockCmd = "timeout /t 10\n" +
-                                               "rundll32.exe user32.dll,LockWorkStation";
+                                                     @"FOR /L %%N IN () DO call ""start - ei8.host.bat""";
         }
     }
 }

@@ -5,20 +5,11 @@ using ei8.Avatar.Installer.Application;
 using ei8.Avatar.Installer.Application.Avatar;
 using ei8.Avatar.Installer.Common;
 using ei8.Avatar.Installer.Domain.Model.Configuration;
-using ei8.Avatar.Installer.Port.Adapter.UI.Maui.Views;
 using ei8.Avatar.Installer.Port.Adapter.UI.Maui.Validation;
 using ei8.Avatar.Installer.Port.Adapter.UI.Maui.Validation.Rules;
 using MetroLog.Maui;
 using neurUL.Common.Domain.Model;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ei8.Avatar.Installer.Port.Adapter.UI.Maui.ViewModels;
 
@@ -36,14 +27,12 @@ public partial class CreateAvatarViewModel : BaseViewModel
         public const string AvatarServerConfigurationMustContainAvatar = "AvatarServerConfiguration must contain at least one avatar";
         public const string PrivateKeyPathTemplate = "/C/keys/{0}";
         public const string JsonFileExtension = "json";
-        
+
         // Validation Messages
-        public const string AvatarIpRequired = "Avatar IP address is required";
+        public const string AvatarNameRequired = "Avatar Name is required";
+        public const string TunnelLocalPortRequired = "Tunnel Local Port is required";
         public const string InvalidIpFormat = "Invalid IP address format (e.g., 172.20.10.4)";
-        public const string Un8yIpRequired = "Un8y IP address is required";
-        public const string AvatarPortRequired = "Avatar port is required";
         public const string PortRangeInvalid = "Port must be between 1 and 65535";
-        public const string Un8yBlazorPortRequired = "Un8y Blazor port is required";
         public const string GraphPersistencePortRequired = "Graph persistence port is required";
         public const string KeysPathRequiredWhenEncryptionEnabled = "Keys path is required when encryption is enabled";
         public const string InProcessPrivateKeyPathRequired = "In Process Private Key Path is required when encryption is enabled";
@@ -56,7 +45,7 @@ public partial class CreateAvatarViewModel : BaseViewModel
     #region Fields
     private readonly IAvatarApplicationService avatarApplicationService;
     private readonly IProgressService progressService;
-    private AvatarServerConfiguration avatarServerConfiguration = new(string.Empty);
+    private AvatarServerConfiguration avatarServerConfiguration = new();
     #endregion
 
     #region Constructors
@@ -77,25 +66,18 @@ public partial class CreateAvatarViewModel : BaseViewModel
     #endregion
 
     #region Properties
-    // Server Properties
-    [ObservableProperty]
-    private string serverName = string.Empty;
     [ObservableProperty]
     private string destination = string.Empty;
 
     // Avatar Properties
-    [ObservableProperty]
-    private string name = string.Empty;
     [ObservableProperty]
     private string ownerName = string.Empty;
     [ObservableProperty]
     private string ownerUserId = string.Empty;
 
     // Orchestration Properties (with validation)
-    public ValidatableObject<string> AvatarIp { get; private set; }
-    public ValidatableObject<string> Un8yIp { get; private set; }
-    public ValidatableObject<string> AvatarInPort { get; private set; }
-    public ValidatableObject<string> Un8yBlazorPort { get; private set; }
+    public ValidatableObject<string> AvatarName { get; private set; }
+    public ValidatableObject<string> TunnelLocalPort { get; private set; }
     public ValidatableObject<string> GraphPersistencePort { get; private set; }
     public ValidatableObject<string> KeysPath { get; private set; }
 
@@ -149,10 +131,8 @@ public partial class CreateAvatarViewModel : BaseViewModel
     private void InitializeValidation()
     {
         // Initialize ValidatableObject properties
-        this.AvatarIp = new ValidatableObject<string>();
-        this.Un8yIp = new ValidatableObject<string>();
-        this.AvatarInPort = new ValidatableObject<string>();
-        this.Un8yBlazorPort = new ValidatableObject<string>();
+        this.AvatarName = new ValidatableObject<string>();
+        this.TunnelLocalPort = new ValidatableObject<string>();
         this.GraphPersistencePort = new ValidatableObject<string>();
         this.KeysPath = new ValidatableObject<string>();
         this.InProcessPrivateKeyPath = new ValidatableObject<string>();
@@ -167,42 +147,17 @@ public partial class CreateAvatarViewModel : BaseViewModel
 
     private void AddValidationRules()
     {
-        // IP Address validation rules
-        this.AvatarIp.Validations.Add(new IsNotNullOrEmptyRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.AvatarIpRequired 
+        this.AvatarName.Validations.Add(new IsNotNullOrEmptyRule<string>
+        {
+            ValidationMessage = CreateAvatarConstants.AvatarNameRequired
         });
-        this.AvatarIp.Validations.Add(new IpAddressRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.InvalidIpFormat 
+        this.TunnelLocalPort.Validations.Add(new IsNotNullOrEmptyRule<string>
+        {
+            ValidationMessage = CreateAvatarConstants.TunnelLocalPortRequired
         });
-
-        this.Un8yIp.Validations.Add(new IsNotNullOrEmptyRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.Un8yIpRequired 
-        });
-        this.Un8yIp.Validations.Add(new IpAddressRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.InvalidIpFormat 
-        });
-
-        // Port validation rules
-        this.AvatarInPort.Validations.Add(new IsNotNullOrEmptyRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.AvatarPortRequired 
-        });
-        this.AvatarInPort.Validations.Add(new PortNumberRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.PortRangeInvalid 
-        });
-
-        this.Un8yBlazorPort.Validations.Add(new IsNotNullOrEmptyRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.Un8yBlazorPortRequired 
-        });
-        this.Un8yBlazorPort.Validations.Add(new PortNumberRule<string> 
-        { 
-            ValidationMessage = CreateAvatarConstants.PortRangeInvalid 
+        this.TunnelLocalPort.Validations.Add(new PortNumberRule<string>
+        {
+            ValidationMessage = CreateAvatarConstants.PortRangeInvalid
         });
 
         // Graph persistence port validation
@@ -250,39 +205,21 @@ public partial class CreateAvatarViewModel : BaseViewModel
 
     private void SubscribeToValidationPropertyChanges()
     {
-        this.AvatarIp.PropertyChanged += (s, e) => 
+        this.AvatarName.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(ValidatableObject<string>.Value))
             {
-                this.AvatarIp.Validate();
-                this.UpdateAvatarIfExists(a => a.Orchestration, o => o.AvatarIp = this.AvatarIp.Value);
+                this.AvatarName.Validate();
+                this.UpdateAvatarIfExists(a => a.Orchestration, o => o.AvatarName = this.AvatarName.Value);
             }
         };
 
-        this.Un8yIp.PropertyChanged += (s, e) => 
+        this.TunnelLocalPort.PropertyChanged += (s, e) =>
         {
             if (e.PropertyName == nameof(ValidatableObject<string>.Value))
             {
-                this.Un8yIp.Validate();
-                this.UpdateAvatarIfExists(a => a.Orchestration, o => o.Un8yIp = this.Un8yIp.Value);
-            }
-        };
-
-        this.AvatarInPort.PropertyChanged += (s, e) => 
-        {
-            if (e.PropertyName == nameof(ValidatableObject<string>.Value))
-            {
-                this.AvatarInPort.Validate();
-                this.UpdateAvatarIfExists(a => a.Orchestration, (o, port) => o.AvatarInPort = port, this.AvatarInPort.Value, v => int.TryParse(v, out int port) ? port : 0);
-            }
-        };
-
-        this.Un8yBlazorPort.PropertyChanged += (s, e) => 
-        {
-            if (e.PropertyName == nameof(ValidatableObject<string>.Value))
-            {
-                this.Un8yBlazorPort.Validate();
-                this.UpdateAvatarIfExists(a => a.Orchestration, (o, port) => o.Un8yBlazorPort = port, this.Un8yBlazorPort.Value, v => int.TryParse(v, out int port) ? port : 0);
+                this.TunnelLocalPort.Validate();
+                this.UpdateAvatarIfExists(a => a.Orchestration, (o, port) => o.TunnelLocalPort = port, this.TunnelLocalPort.Value, v => int.TryParse(v, out int port) ? port : 0);
             }
         };
 
@@ -371,11 +308,6 @@ public partial class CreateAvatarViewModel : BaseViewModel
     }
 
     // Property change handlers for automatic configuration updates
-    partial void OnNameChanged(string value)
-    {
-        this.UpdateAvatarIfExists(a => a.Name = value);
-    }
-
     partial void OnOwnerNameChanged(string value)
     {
         this.UpdateAvatarIfExists(a => a.OwnerName = value);
@@ -384,11 +316,6 @@ public partial class CreateAvatarViewModel : BaseViewModel
     partial void OnOwnerUserIdChanged(string value)
     {
         this.UpdateAvatarIfExists(a => a.OwnerUserId = value);
-    }
-
-    partial void OnServerNameChanged(string value)
-    {
-        this.avatarServerConfiguration.ServerName = value;
     }
 
     partial void OnDestinationChanged(string value)
@@ -434,16 +361,14 @@ public partial class CreateAvatarViewModel : BaseViewModel
     private bool ValidateAllFields()
     {
         // Validate all ValidatableObject properties
-        bool isAvatarIpValid = this.AvatarIp.Validate();
-        bool isUn8yIpValid = this.Un8yIp.Validate();
-        bool isAvatarInPortValid = this.AvatarInPort.Validate();
-        bool isUn8yBlazorPortValid = this.Un8yBlazorPort.Validate();
+        bool isAvatarNameValid = this.AvatarName.Validate();
+        bool isTunnelLocalPortValid = this.TunnelLocalPort.Validate();
         bool isKeysPathValid = this.KeysPath.Validate();
         bool isGraphPersistencePortValid = this.GraphPersistencePort.Validate();
         bool isInProcessPrivateKeyPathValid = this.InProcessPrivateKeyPath.Validate();
         bool isEncryptedEventsKeyValid = this.EncryptedEventsKey.Validate();
 
-        return isAvatarIpValid && isUn8yIpValid && isAvatarInPortValid && isUn8yBlazorPortValid &&
+        return isAvatarNameValid && isTunnelLocalPortValid &&
                isGraphPersistencePortValid && isKeysPathValid && isInProcessPrivateKeyPathValid && isEncryptedEventsKeyValid;
     }
 
@@ -473,20 +398,16 @@ public partial class CreateAvatarViewModel : BaseViewModel
                         AssertionConcern.AssertArgumentTrue(this.avatarServerConfiguration.Avatars.Count() > 0, CreateAvatarConstants.AvatarServerConfigurationMustContainAvatar);
                         
                         // Populate all fields from configuration
-                        this.ServerName = this.avatarServerConfiguration.ServerName;
                         this.Destination = this.avatarServerConfiguration.Destination;
                         
                         var avatar = this.avatarServerConfiguration.Avatars[0];
-                        this.Name = avatar.Name;
                         this.OwnerName = avatar.OwnerName;
                         this.OwnerUserId = avatar.OwnerUserId;
                         
                         if (avatar.Orchestration != null)
                         {
-                            this.AvatarIp.Value = avatar.Orchestration.AvatarIp;
-                            this.Un8yIp.Value = avatar.Orchestration.Un8yIp;
-                            this.AvatarInPort.Value = avatar.Orchestration.AvatarInPort.ToString();
-                            this.Un8yBlazorPort.Value = avatar.Orchestration.Un8yBlazorPort.ToString();
+                            this.AvatarName.Value = avatar.Orchestration.AvatarName;
+                            this.TunnelLocalPort.Value = avatar.Orchestration.TunnelLocalPort.ToString();
                             this.GraphPersistencePort.Value = avatar.Orchestration.GraphPersistencePort.ToString();
                             this.KeysPath.Value = avatar.Orchestration.KeysPath;
                         }

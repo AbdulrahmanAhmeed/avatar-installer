@@ -13,4 +13,5 @@ public class AvatarSettings
     public CortexDiaryNucleusSettings CortexDiaryNucleus { get; set; } = new();
     public CortexChatNucleusSettings CortexChatNucleus { get; set; } = new();
     public CortexGraphPersistenceSettings CortexGraphPersistence { get; set; } = new();
+    public SshSettings Ssh { get; set; } = new();
 }

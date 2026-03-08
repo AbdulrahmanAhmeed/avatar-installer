@@ -1,29 +1,17 @@
 {
     "avatars": [
-        {
-            "name": "valdez",
-
-            "cortex_graph": {
-                "db_name": "graph",
-                "db_username": "root",
-                "db_url": "http://cortex.graph.persistence:8529",
-                "arango_root_password": ""
-            },
-
-          "orchestration": {
-            "avatar_ip": "192.168.50.2",
-            "avatar_in_port": 12345,
-            "un8y_ip": "192.168.50.3",
-            "un8y_blazor_port": 23456
-          }
-        }
-    ],
-    "destination": "./sample",
-    "network": {
+      {
+        "cortex_graph": {
+          "db_name": "graph",
+          "db_username": "root",
+          "db_url": "http://cortex.graph.persistence:8529",
+          "arango_root_password": ""
+        },
         "ssh": {
-            "server_alive_interval": 90,
-            "server_alive_count_max": 365000,
-            "remote_forward": "jv:8080"
+          "server_alive_interval": 90,
+          "server_alive_count_max": 365000
         }
-    }
+      }
+    ],
+    "destination": "./sample"
 }

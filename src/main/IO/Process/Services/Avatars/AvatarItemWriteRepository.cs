@@ -1,6 +1,7 @@
 ﻿using ei8.Avatar.Installer.Common;
 using ei8.Avatar.Installer.Domain.Model;
 using ei8.Avatar.Installer.Domain.Model.Avatars;
+using ei8.Avatar.Installer.Domain.Model.Avatars.Settings;
 using ei8.Avatar.Installer.IO.Process.Services.Settings;
 using ei8.Cortex.Coding;
 using ei8.Cortex.Coding.d23.neurULization;
@@ -25,6 +26,7 @@ using Nancy.TinyIoc;
 using neurUL.Common;
 using neurUL.Common.Domain.Model;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 
 namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
@@ -73,6 +75,48 @@ namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
         {
             await SaveEnvironmentVariablesAsync(avatarItem);
             await CreateSqliteDatabasesAsync(avatarItem);
+
+            await SerializeSshSettingsFileAsync(
+                Path.Combine(avatarItem.Id, Common.Constants.Filenames.SshConfig), 
+                avatarItem.Settings.Ssh!,
+                this.logger
+            );
+
+            await CreateBatchFilesAsync(avatarItem.Id, this.logger);
+        }
+
+        private static async Task CreateBatchFilesAsync(string path, ILogger<AvatarItemWriteRepository> logger)
+        {
+            // start - ei8.host.bat
+            logger.LogInformation("Creating {fileName}", Common.Constants.Filenames.StartEi8HostBat);
+            var startEi8HostBatPath = Path.Combine(path, Common.Constants.Filenames.StartEi8HostBat);
+            var sshScript = String.Format(Common.Constants.BatchFileTemplates.StartEi8HostBat, Path.GetFullPath(Path.Combine(path, Common.Constants.Filenames.SshConfig)));
+            await File.WriteAllTextAsync(startEi8HostBatPath, sshScript);
+
+            // loop start - ei8.host.bat
+            logger.LogInformation("Creating {fileName}", Common.Constants.Filenames.LoopStartEi8HostBat);
+            var loopStartEi8HostBatPath = Path.Combine(path, Common.Constants.Filenames.LoopStartEi8HostBat);
+            await File.WriteAllTextAsync(loopStartEi8HostBatPath, Common.Constants.BatchFileTemplates.LoopStartEi8HostBat);
+        }
+
+        private static async Task SerializeSshSettingsFileAsync(string fileName, SshSettings settings, ILogger<AvatarItemWriteRepository> logger)
+        {
+            logger.LogInformation("Creating {fileName}", fileName);
+
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"Host *");
+
+            var props = typeof(SshSettings).GetProperties();
+            foreach (var prop in props)
+            {
+                var propValue = prop.GetValue(settings);
+
+                if (propValue != null)
+                    sb.AppendLine($"\t{prop.Name} {propValue}");
+            }
+
+            await File.WriteAllTextAsync(fileName, sb.ToString());
         }
 
         private async Task SaveEnvironmentVariablesAsync(AvatarItem avatarItem)

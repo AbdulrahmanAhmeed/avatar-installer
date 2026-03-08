@@ -57,11 +57,6 @@
 
             <!-- Server Section -->
             <Label Text="Server" FontSize="18" FontAttributes="Bold" Margin="0,20,0,10" />
-            <Label Text="Server Name *" FontSize="14" FontAttributes="Bold" Margin="0,0,0,5" />
-            <Entry
-                Text="{Binding ServerName}"
-                Placeholder="Enter server name"
-                FontSize="14" />
             <Label Text="Destination Folder *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
             <Grid ColumnDefinitions="3*,*">
                 <Entry
@@ -80,12 +75,6 @@
 
             <!-- Avatar Section -->
             <Label Text="Avatar" FontSize="18" FontAttributes="Bold" Margin="0,20,0,10" />
-            <Label Text="Name *" FontSize="14" FontAttributes="Bold" Margin="0,0,0,5" />
-            <Entry
-                Text="{Binding Name}"
-                Placeholder="Enter avatar name"
-                FontSize="14" />
-            <Label Text="Owner Name *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
             <Entry
                 Text="{Binding OwnerName}"
                 Placeholder="Enter owner name"
@@ -100,85 +89,59 @@
             <Label Text="Orchestration" FontSize="18" FontAttributes="Bold" Margin="0,20,0,10" />
             <Label Text="Avatar IP *" FontSize="14" FontAttributes="Bold" Margin="0,0,0,5" />
             <Entry
-                Text="{Binding AvatarIp.Value, Mode=TwoWay}"
+                Text="{Binding AvatarName.Value, Mode=TwoWay}"
                 Placeholder="Enter avatar IP address (e.g., 172.20.10.4)"
                 FontSize="14">
                 <Entry.Triggers>
                     <DataTrigger 
                         TargetType="Entry"
-                        Binding="{Binding AvatarIp.IsValid}"
+                        Binding="{Binding AvatarName.IsValid}"
                         Value="False">
                         <Setter Property="BackgroundColor" Value="LightPink" />
                     </DataTrigger>
                 </Entry.Triggers>
             </Entry>
             <Label
-                Text="{Binding AvatarIp.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
+                Text="{Binding AvatarName.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
                 FontSize="12"
                 TextColor="Red"
-                IsVisible="{Binding AvatarIp.Errors, Converter={StaticResource StringToVisibilityConverter}}"
+                IsVisible="{Binding AvatarName.Errors, Converter={StaticResource StringToVisibilityConverter}}"
                 Margin="0,2,0,5" />
-            <Label Text="Avatar In Port *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
+            <Label Text="Tunel Local Port *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
             <Entry
-                Text="{Binding AvatarInPort.Value, Mode=TwoWay}"
-                Placeholder="Enter avatar port (1-65535)"
+            Text="{Binding TunnelLocalPort.Value, Mode=TwoWay}"
+            Placeholder="Enter avatar port (1-65535)"
+            FontSize="14"
+            Keyboard="Numeric">
+                <Entry.Triggers>
+                    <DataTrigger 
+                    TargetType="Entry"
+                    Binding="{Binding TunnelLocalPort.IsValid}"
+                    Value="False">
+                        <Setter Property="BackgroundColor" Value="LightPink" />
+                    </DataTrigger>
+                </Entry.Triggers>
+            </Entry>
+            <Label Text="Graph Persistence Port *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
+            <Entry
+                Text="{Binding GraphPersistencePort.Value, Mode=TwoWay}"
+                Placeholder="Enter Graph persistence port (1-65535)"
                 FontSize="14"
                 Keyboard="Numeric">
                 <Entry.Triggers>
                     <DataTrigger 
                         TargetType="Entry"
-                        Binding="{Binding AvatarInPort.IsValid}"
+                        Binding="{Binding GraphPersistencePort.IsValid}"
                         Value="False">
                         <Setter Property="BackgroundColor" Value="LightPink" />
                     </DataTrigger>
                 </Entry.Triggers>
             </Entry>
             <Label
-                Text="{Binding AvatarInPort.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
+                Text="{Binding GraphPersistencePort.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
                 FontSize="12"
                 TextColor="Red"
-                IsVisible="{Binding AvatarInPort.Errors, Converter={StaticResource StringToVisibilityConverter}}"
-                Margin="0,2,0,5" />
-            <Label Text="Un8y IP *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
-            <Entry
-                Text="{Binding Un8yIp.Value, Mode=TwoWay}"
-                Placeholder="Enter Un8y IP address (e.g., 172.20.10.4)"
-                FontSize="14">
-                <Entry.Triggers>
-                    <DataTrigger 
-                        TargetType="Entry"
-                        Binding="{Binding Un8yIp.IsValid}"
-                        Value="False">
-                        <Setter Property="BackgroundColor" Value="LightPink" />
-                    </DataTrigger>
-                </Entry.Triggers>
-            </Entry>
-            <Label
-                Text="{Binding Un8yIp.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
-                FontSize="12"
-                TextColor="Red"
-                IsVisible="{Binding Un8yIp.Errors, Converter={StaticResource StringToVisibilityConverter}}"
-                Margin="0,2,0,5" />
-            <Label Text="Un8y Blazor Port *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
-            <Entry
-                Text="{Binding Un8yBlazorPort.Value, Mode=TwoWay}"
-                Placeholder="Enter Un8y Blazor port (1-65535)"
-                FontSize="14"
-                Keyboard="Numeric">
-                <Entry.Triggers>
-                    <DataTrigger 
-                        TargetType="Entry"
-                        Binding="{Binding Un8yBlazorPort.IsValid}"
-                        Value="False">
-                        <Setter Property="BackgroundColor" Value="LightPink" />
-                    </DataTrigger>
-                </Entry.Triggers>
-            </Entry>
-            <Label
-                Text="{Binding Un8yBlazorPort.Errors, Converter={StaticResource FirstValidationErrorConverter}}"
-                FontSize="12"
-                TextColor="Red"
-                IsVisible="{Binding Un8yBlazorPort.Errors, Converter={StaticResource StringToVisibilityConverter}}"
+                IsVisible="{Binding GraphPersistencePort.Errors, Converter={StaticResource StringToVisibilityConverter}}"
                 Margin="0,2,0,5" />
             <Label Text="Graph Persistence Port *" FontSize="14" FontAttributes="Bold" Margin="0,10,0,5" />
             <Entry

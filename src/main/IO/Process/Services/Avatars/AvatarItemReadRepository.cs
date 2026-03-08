@@ -25,9 +25,8 @@ namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
                 return null;
             }
 
-            // assuming id is a path string, get the avatar name from it
-            var avatarName = new DirectoryInfo(id).Name;
-            var avatarItem = new AvatarItem(id, avatarName);
+            // assuming id is a path string
+            var avatarItem = new AvatarItem(id);
 
             foreach (var file in Directory.EnumerateFiles(id))
             {
@@ -54,6 +53,11 @@ namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
                             await GetEnvironmentVariablesFromFileAsync(file)
                         );
                         break;
+                    case Common.Constants.Filenames.SshConfig:
+                        logger.LogInformation("Loading {file}", file);
+
+                        avatarItem.Settings.Ssh = await DeserializeSshSettingsFile(Path.Combine(id, Constants.Filenames.SshConfig), logger);
+                        break;
                 }
             }
 
@@ -75,7 +79,7 @@ namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
             return avatarItem;
         }
 
-        private async Task<Dictionary<string, string>> GetEnvironmentVariablesFromFileAsync(string file)
+        private static async Task<Dictionary<string, string>> GetEnvironmentVariablesFromFileAsync(string file)
         {
             return (await File.ReadAllLinesAsync(file))
                               .Where(l => !l.StartsWith('#') && !string.IsNullOrWhiteSpace(l)) // ignore comments and newlines
@@ -102,5 +106,49 @@ namespace ei8.Avatar.Installer.IO.Process.Services.Avatars
             return settings;
         }
 
+        private static async Task<SshSettings> DeserializeSshSettingsFile(string fileName, ILogger<AvatarItemWriteRepository> logger)
+        {
+            if (!File.Exists(fileName))
+            {
+                logger.LogWarning("Unable to find SSH settings file: {fileName}", fileName);
+                return null;
+            }
+
+            logger.LogInformation("Deserializing {fileName}", fileName);
+
+            SshSettings result = null;
+
+            using (var file = new StreamReader(fileName))
+            {
+                string line;
+                string currentKey = null;
+
+                while ((line = await file.ReadLineAsync()) != null)
+                {
+                    if (line.StartsWith("Host"))
+                    {
+                        var hostLine = line.Split(' ');
+                        currentKey = hostLine[1];
+
+                        result = new SshSettings();
+                    }
+                    else if (line.StartsWith('\t') || line.StartsWith("    "))
+                    {
+                        var settingLine = line.TrimStart()
+                                              .Split(' ');
+
+                        var propName = settingLine[0];
+                        var propValue = string.Join(' ', settingLine.Skip(1));
+
+                        var prop = typeof(SshSettings).GetProperty(propName);
+
+                        if (prop != null)
+                            prop.SetValueFromString(result, propValue);
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

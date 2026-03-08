@@ -11,11 +11,6 @@ namespace ei8.Avatar.Installer.Domain.Model.Avatars
         public string Id { get; set; }
 
         /// <summary>
-        /// The folder name of the Avatar.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         /// The name of the neurULized Avatar instance.
         /// </summary>
         public string OwnerName { get; set; }
@@ -25,21 +20,16 @@ namespace ei8.Avatar.Installer.Domain.Model.Avatars
         /// </summary>
         public string OwnerUserId { get; set; }
 
-        public RoutingSettings RoutingSettings { get; set; } = new();
         public AvatarSettings Settings { get; set; } = new();
         public Un8ySettings Un8ySettings { get; set; } = new();
         public OrchestrationSettings OrchestrationSettings { get; set; } = new();
 
-        public AvatarItem(string id, string name)
+        public AvatarItem(string id)
         {
             AssertionConcern.AssertArgumentNotEmpty(id, "Specified 'id' cannot be empty.", nameof(id));
             AssertionConcern.AssertArgumentNotNull(id, nameof(id));
 
-            AssertionConcern.AssertArgumentNotEmpty(name, "Specified 'name' cannot be empty.", nameof(name));
-            AssertionConcern.AssertArgumentNotNull(name, nameof(name));
-
             this.Id = id;
-            this.Name = name;
         }
     }
 }

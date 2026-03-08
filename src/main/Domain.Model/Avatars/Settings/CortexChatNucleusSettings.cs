@@ -4,5 +4,5 @@ public class CortexChatNucleusSettings
 {
     public int PageSize { get; set; }
     public string AppUserId { get; set; }
-    public bool CreateExternalReferencesIfNotFound { get; set; }
+    public bool InitializeMissingMirrors { get; set; }
 }
