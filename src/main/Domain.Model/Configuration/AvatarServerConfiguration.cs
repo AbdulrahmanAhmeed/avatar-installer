@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace ei8.Avatar.Installer.Domain.Model.Configuration
 {
@@ -145,6 +145,7 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
         public string BasePath { get; set; }
         public string CertificatePassword { get; set; }
         public string CertificatePath { get; set; }
+        public PluginConfig[] Plugins { get; set; }
 
         /// <summary>
         /// Initialize with defaults
@@ -158,6 +159,20 @@ namespace ei8.Avatar.Installer.Domain.Model.Configuration
             BasePath = "/${AVATAR_NAME}/un8y";
             CertificatePassword = string.Empty;
             CertificatePath = "/https/aspnetapp.pfx";
+            Plugins = Array.Empty<PluginConfig>();
+        }
+    }
+
+    public class PluginConfig
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }
+
+        [JsonConstructor]
+        public PluginConfig()
+        {
+            Name = string.Empty;
+            Url = string.Empty;
         }
     }
 

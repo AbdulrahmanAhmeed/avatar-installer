@@ -1,0 +1,52 @@
+{
+    "avatars": [
+      {
+        "cortex_graph": {
+          "db_name": "graph",
+          "db_username": "root",
+          "db_url": "http://cortex.graph.persistence:8529",
+          "arango_root_password": ""
+        },
+
+        "avatar_api": {
+          "token_issuer_address": "https://www.example.com/token"
+        },
+
+        "un8y": {
+          "oidc_authority_url": "https://www.example.com/oidc",
+          "certificate_password": "mypass",
+          "certificate_path": "/mypath/my.pfx",
+          "plugins": [
+            {
+              "name": "cortex-diary",
+              "url": "https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fei8%2Fcortex-diary%2Ftree%2Fmaster%2Fplugins"
+            },
+            {
+              "name": "cortex-chat",
+              "url": "https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fei8%2Fcortex-diary%2Ftree%2Fmaster%2Fplugins"
+            }
+          ]
+        },
+
+        "event_sourcing": {
+          "private_key_path": "/key/path",
+          "in_process_private_key_path": "/key/inprocesspath",
+          "encryption_enabled": true,
+          "encrypted_events_key": "encryptedkey"
+        },
+
+        "orchestration": {
+          "avatar_name": "jsonavatar",
+          "tunnel_local_port": 9441,
+          "keys_path": "my/keys"
+        },
+        "ssh": {
+          "server_alive_interval": 60,
+          "server_alive_count_max": 525600,
+          "port": 2222,
+          "host_name": "ei8.host"
+        }
+      }
+    ],
+    "destination": "C:/ei8/avatars"
+}

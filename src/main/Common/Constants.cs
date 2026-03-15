@@ -1,4 +1,4 @@
-﻿namespace ei8.Avatar.Installer.Common
+namespace ei8.Avatar.Installer.Common
 {
     public sealed class Constants
     {
@@ -196,6 +196,7 @@
         public sealed class Urls
         {
             public const string DefaultTemplateDownloadUrl = "https://github.com/ei8/avatar-template.git";
+            public const string DefaultPluginsDownloadUrl = "https://github.com/ei8/avatar-plugins/releases/latest/download/plugins.zip";
         }
 
         public sealed class BatchFileTemplates

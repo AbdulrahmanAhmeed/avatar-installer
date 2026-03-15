@@ -1,6 +1,7 @@
-﻿using ei8.Avatar.Installer.Domain.Model.Avatars;
+using ei8.Avatar.Installer.Domain.Model.Avatars;
 using ei8.Avatar.Installer.Domain.Model.Configuration;
 using ei8.Avatar.Installer.Domain.Model.Mapping;
+using ei8.Avatar.Installer.Domain.Model.Plugins;
 using ei8.Avatar.Installer.Domain.Model.Template;
 using Microsoft.Extensions.Logging;
 using neurUL.Common.Domain.Model;
@@ -16,6 +17,7 @@ namespace ei8.Avatar.Installer.Application.Avatar
         private readonly IAvatarItemWriteRepository avatarItemWriteRepository;
         private readonly IAvatarMapperService avatarMapperService;
         private readonly ITemplateService templateService;
+        private readonly IPluginsService pluginsService;
 
         public AvatarApplicationService(
             IConfigurationRepository configurationRepository,
@@ -24,7 +26,8 @@ namespace ei8.Avatar.Installer.Application.Avatar
             IAvatarItemReadRepository avatarItemReadRepository,
             IAvatarItemWriteRepository avatarItemWriteRepository,
             IAvatarMapperService avatarMapperService,
-            ITemplateService templateService
+            ITemplateService templateService,
+            IPluginsService pluginsService
         )
         {
             this.configurationRepository = configurationRepository;
@@ -34,6 +37,7 @@ namespace ei8.Avatar.Installer.Application.Avatar
             this.avatarItemWriteRepository = avatarItemWriteRepository;
             this.avatarMapperService = avatarMapperService;
             this.templateService = templateService;
+            this.pluginsService = pluginsService;
         }
 
         public async Task<AvatarServerConfiguration> ReadAvatarConfiguration(string configPath)
@@ -67,6 +71,22 @@ namespace ei8.Avatar.Installer.Application.Avatar
                     );
                 else
                     templateService.DownloadTemplate(subdirectory, templateUrl);
+
+                foreach (var plugin in item.Un8y.Plugins)
+                {
+                    if (string.IsNullOrWhiteSpace(plugin.Name) || string.IsNullOrWhiteSpace(plugin.Url))
+                        continue;
+
+                    var pluginDirectory = Path.Combine(subdirectory, "un8y", "plugins", plugin.Name);
+                    if (Directory.Exists(pluginDirectory) && Directory.GetFiles(pluginDirectory).Any())
+                        logger.LogInformation(
+                            "{pluginDirectory} is not empty. Using existing plugin '{pluginName}'.",
+                            pluginDirectory,
+                            plugin.Name
+                        );
+                    else
+                        await pluginsService.DownloadAndExtractAsync(pluginDirectory, plugin.Url);
+                }
 
                 var avatar = await this.avatarItemReadRepository.GetByAsync(subdirectory);
 
